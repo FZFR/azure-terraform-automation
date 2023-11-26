@@ -38,4 +38,6 @@ jobs:
         path: tfplan      
 
     - name: Terraform Destroy
-      run: terraform plan -destroy -out destroy.tfplan
+      run: |
+        terraform plan -destroy -out destroy.tfplan
+        terraform apply destroy.tfplan
