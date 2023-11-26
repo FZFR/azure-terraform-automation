@@ -33,11 +33,10 @@ jobs:
         terraform_wrapper: false    
         
     # Download artifact
-    - name: Publish Terraform Plan
+    - name: Download Terraform Plan
       uses: actions/download-artifact@v3
       with:
-        name: tfplan
-        path: tfplan      
+        name: tfplan           
 
     - name: Terraform Destroy
       run: |
