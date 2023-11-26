@@ -32,18 +32,22 @@ jobs:
       with:
         terraform_wrapper: false    
     
-    - name: Configure Terraform
-      run: terraform init
-    
     # Download artifact
     - name: Download artifact
       uses: dawidd6/action-download-artifact@v2
       with:        
         workflow: create-vm.yml
         workflow_conclusion: success       
-        name: tfplan        
+        name: terraform.tfstate
 
     - name: Terraform Destroy
       run: |
         terraform plan -destroy -out destroy.tfplan
         terraform apply destroy.tfplan
+
+    # Save plan to artifacts  
+    - name: Publish Terraform Plan
+      uses: actions/upload-artifact@v3
+      with:
+        name: destroy.tfplan
+        path: destroy.tfplan 
