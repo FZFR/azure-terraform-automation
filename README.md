@@ -15,17 +15,18 @@ The Terraform configuration files are located in the root directory:
 
 There is an `az` folder that includes a compilation of minimal and all Azure images as of November 2023, primarily focused on the East US region for reference. Note that there might be slight variations in other regions.
 
-The `.github/workflows` directory hosts GitHub Actions workflow file for automated infrastructure provisioning:
+The `.github/workflows` directory hosts GitHub Actions workflow files for automated infrastructure provisioning:
 
 - `create-vm.yml`: Orchestrates the creation/update of infrastructure.
+- `destroy-vm.yml`: Destroys the infrastructure based on the existing plan.
 
-This file accommodates various VM configuration parameters as inputs, utilizing them to generate and execute plans.
+These files accommodate various VM configuration parameters as inputs, utilizing them to generate and execute plans.
 
-For instance, customization of VM size, image details, etc., can be effortlessly achieved without the need to interact with the Azure portal directly. This capability empowers you to efficiently create multiple VMs configured behind a load balancer.
+For instance, customization of VM size, image details, etc., can be effortlessly achieved without the need to interact with the Azure portal directly. 
 
 # Using the GitHub Actions Workflow
 
-This repository contains a GitHub Actions workflow (`create-vm.yml`) to automate infrastructure provisioning on Azure using Terraform.
+This repository contains a GitHub Actions workflow (`create-vm.yml` and `destroy-vm.yml`) to automate infrastructure provisioning on Azure using Terraform.
 
 ## Workflow Overview
 
@@ -34,11 +35,10 @@ The workflow does the following:
 1. Validates and generates Terraform plan 
 2. Allows specifying custom VM parameters
 3. Applies the changes to create/update infrastructure  
-    
-     
-  
+4. The `destroy-vm.yml` workflow is designed to gracefully destroy the infrastructure based on the existing Terraform plan. It simplifies the process of tearing down the provisioned resources, ensuring a smooth and controlled deprovisioning.
 
-## Steps:
+
+## Getting Started:
 here be step-by-step guide to run your repository and create a VM in Azure using the provided workflow dispatch:
 
 ### Prerequisites:
@@ -110,18 +110,8 @@ By following these steps, you should be able to configure your GitHub Actions wo
 
 By following these steps, you should be able to create a VM in Azure using the GitHub Actions workflow you've configured. Make sure to configure and customize the input variables according to your project needs.
 
-## Scaling Infrastructure
-
-While this repository shows a simple example with a single VM, the workflows can be easily modified to provison multiple VMs behind a load balancer by editing `vm.tf`. 
-
-Some ways to scale this:
-
-- Create multiple instances by adding `count` meta-argument to the `azurerm_linux_virtual_machine` resource.
-
-- Create a module in a separate `modules/vm` folder and iterate using `module` blocks. Parameterize inputs.
-
-- Add an Azure load balancer resource and associate multiple VMs.
-
-So you can save significant time by provisioning dozens or even thousands of VMs without needing to touch the Azure portal!
-
-If any part of scaling or modification is unclear, please open an issue or discussion forum thread for assistance.
+## Common issue
+```js
+│ Error: checking for presence of existing resource group: resources.GroupsClient#Get: Failure responding to request: StatusCode=403 -- Original Error: autorest/azure: Service returned an error. Status=403 Code="AuthorizationFailed" Message="The client does not have authorization to perform action 'Microsoft.Resources/subscriptions/resourcegroups/read' over scope '/subscriptions/***/resourcegroups/***' or the scope is invalid. If access was recently granted, please refresh your credentials."
+```
+If you encounter the above error, it may be due to authorization issues when checking for the presence of an existing resource group. Please refer [to this article](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal) for additional insights on creating a service principal in the Azure portal and resolving authorization-related problems.
