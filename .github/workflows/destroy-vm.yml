@@ -46,7 +46,7 @@ jobs:
         terraform apply destroy.tfplan
 
     # Save plan to artifacts  
-    - name: Publish Terraform Plan
+    - name: Publish Terraform destroy.tfplan
       uses: actions/upload-artifact@v3
       with:
         name: destroy.tfplan

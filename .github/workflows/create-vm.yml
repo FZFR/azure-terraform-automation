@@ -91,7 +91,7 @@ jobs:
       run: terraform apply -auto-approve tfplan
 
      # Save tfstate to artifacts  
-    - name: Publish Terraform Plan
+    - name: Publish Terraform tfstate
       uses: actions/upload-artifact@v3
       with:
         name: terraform.tfstate
