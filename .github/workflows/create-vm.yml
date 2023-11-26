@@ -33,7 +33,8 @@ permissions:
 env:
   ARM_CLIENT_ID: "${{ secrets.AZ_CLIENT_ID }}"
   ARM_SUBSCRIPTION_ID: "${{ secrets.AZ_SUBSCRIPTION_ID }}"
-  ARM_TENANT_ID: "${{ secrets.AZ_TENANT_ID }}"  
+  ARM_TENANT_ID: "${{ secrets.AZ_TENANT_ID }}"
+  ARM_CLIENT_SECRET: "${{ secrets.AZ_CLIENT_SECRET }}"  
 
 jobs:
   terraform-plan:
@@ -62,49 +63,15 @@ jobs:
 
     # Checks that all Terraform configuration files adhere to a canonical format
     # Will fail the build if not
-    - name: Terraform Format
-      run: terraform fmt -check
-
-    # Generates an execution plan for Terraform
-    # An exit code of 0 indicated no changes, 1 a terraform failure, 2 there are pending changes.
-    - name: Terraform Plan
-      id: tf-plan
-      run: |
-        export exitcode=0
-        terraform plan -detailed-exitcode -no-color -out tfplan || export exitcode=$?
-
-        echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
-        
-        if [ $exitcode -eq 1 ]; then
-          echo Terraform Plan Failed!
-          exit 1
-        else 
-          exit 0
-        fi
+    - name: Terraform Format      
+      run: terraform plan -out main.tfplan
         
     # Save plan to artifacts  
     - name: Publish Terraform Plan
       uses: actions/upload-artifact@v3
       with:
-        name: tfplan
-        path: tfplan
-        
-    # Create string output of Terraform Plan
-    - name: Create String Output
-      id: tf-plan-string
-      run: |
-        TERRAFORM_PLAN=$(terraform show -no-color tfplan)
-        
-        delimiter="$(openssl rand -hex 8)"
-        echo "summary<<${delimiter}" >> $GITHUB_OUTPUT
-        echo "## Terraform Plan Output" >> $GITHUB_OUTPUT
-        echo "<details><summary>Click to expand</summary>" >> $GITHUB_OUTPUT
-        echo "" >> $GITHUB_OUTPUT
-        echo '```terraform' >> $GITHUB_OUTPUT
-        echo "$TERRAFORM_PLAN" >> $GITHUB_OUTPUT
-        echo '```' >> $GITHUB_OUTPUT
-        echo "</details>" >> $GITHUB_OUTPUT
-        echo "${delimiter}" >> $GITHUB_OUTPUT
+        name: main.tfplan
+        path: tfplan      
         
     # Publish Terraform Plan as task summary
     - name: Publish Terraform Plan to Task Summary
