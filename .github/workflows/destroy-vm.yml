@@ -1,0 +1,41 @@
+name: Destroy VM
+
+on:
+  workflow_dispatch:    
+
+#Special permissions required for OIDC authentication
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  terraform-plan:
+    name: 'Destroy VM'
+    runs-on: ubuntu-latest
+    env:      
+      ARM_SKIP_PROVIDER_REGISTRATION: true
+      ARM_CLIENT_ID: "${{ secrets.AZ_CLIENT_ID }}"
+      ARM_SUBSCRIPTION_ID: "${{ secrets.AZ_SUBSCRIPTION_ID }}"
+      ARM_TENANT_ID: "${{ secrets.AZ_TENANT_ID }}"
+      ARM_CLIENT_SECRET: "${{ secrets.AZ_CLIENT_SECRET }}"  
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Install the latest version of the Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_wrapper: false    
+        
+    # Download artifact
+    - name: Publish Terraform Plan
+      uses: actions/download-artifact@v3
+      with:
+        name: tfplan
+        path: tfplan      
+
+    - name: Terraform Destroy
+      run: terraform plan -destroy -out destroy.tfplan
