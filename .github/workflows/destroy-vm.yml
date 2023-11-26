@@ -31,12 +31,17 @@ jobs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_wrapper: false    
-        
+    
+    - name: Configure Terraform
+      run: terraform init
+    
     # Download artifact
-    - name: Download Terraform Plan
-      uses: actions/download-artifact@v3
-      with:
-        name: tfplan           
+    - name: Download artifact
+      uses: dawidd6/action-download-artifact@v2
+      with:        
+        workflow: create-vm.yml
+        workflow_conclusion: success       
+        name: tfplan        
 
     - name: Terraform Destroy
       run: |
