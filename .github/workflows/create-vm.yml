@@ -85,7 +85,7 @@ jobs:
     - name: Download Terraform Plan
       uses: actions/download-artifact@v3
       with:
-        name: main.tfplan
+        name: tfplan
 
     - name: Apply deployment      
       run: terraform apply -auto-approve tfplan
